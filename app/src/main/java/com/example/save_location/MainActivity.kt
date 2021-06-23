@@ -73,8 +73,10 @@ class MainActivity : AppCompatActivity() {
             // Location[fused 37.421998,-122.084000 hAcc=20 et=+1d13h40m16s333ms alt=5.0 vel=0.0 vAcc=40 sAcc=??? bAcc=??? {Bundle[mParcelledData.dataSize=52]}]
             // fused A, B = 위도, 경도
 
-            L = L.replace("Location[fused ", "")
-            L = L.replace(" hAcc", "*")
+            L = L.replace("Location[fused", "")
+            L = L.replace("hAcc", "*")
+
+            Log.d("L", L)
 
 
             var check : Int = 0
@@ -84,6 +86,8 @@ class MainActivity : AppCompatActivity() {
                     check = i
                 }
             }
+            //Log.d("L", L)
+            Log.d("L", (check-1).toString())
             L = L.substring(0, check-1)
 
             for(i in L.indices){
@@ -93,8 +97,6 @@ class MainActivity : AppCompatActivity() {
                 end = i
             }
 
-            //L = L.split(",").toString()
-
             lat = L.substring(0, check).toDouble()
             log = L.substring(check+1, end).toDouble()
 
@@ -103,6 +105,15 @@ class MainActivity : AppCompatActivity() {
             var asdf : String = "위도 : " + lat.toString() + " 경도 : " + log.toString()
 
             L_textView.setText(asdf)
+
+            val geocoder = Geocoder(this)
+            val list = geocoder.getFromLocation(lat, log, 1)
+            val address = list[0].getAddressLine(0)
+
+            L_textView.setText(address)
+
+            Log.d("L", address)
+
 
 
 
