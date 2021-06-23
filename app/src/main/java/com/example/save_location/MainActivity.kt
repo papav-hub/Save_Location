@@ -38,9 +38,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
 
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -67,10 +64,10 @@ class MainActivity : AppCompatActivity() {
                 }
 
 
-        L_Btn.setOnClickListener {// 위치 불러오기 버튼
+        L_Btn.setOnClickListener {////////////////////////////////////////////////////////////////////////////// 위치 불러오기 버튼
             L_textView.setText(L)
             Log.d("L", L)
-            // Location[fused 37.421998,-122.084000 hAcc=20 et=+1d13h40m16s333ms alt=5.0 vel=0.0 vAcc=40 sAcc=??? bAcc=??? {Bundle[mParcelledData.dataSize=52]}]
+            // L = Location[fused 37.421998,-122.084000 hAcc=20 et=+1d13h40m16s333ms alt=5.0 vel=0.0 vAcc=40 sAcc=??? bAcc=??? {Bundle[mParcelledData.dataSize=52]}]
             // fused A, B = 위도, 경도
 
             L = L.replace("Location[fused", "")
@@ -81,7 +78,7 @@ class MainActivity : AppCompatActivity() {
 
             var check : Int = 0
             var end : Int = 0
-            for(i in L.indices){
+            for(i in L.indices){ // 필터링
                 if(L[i]=='*'){
                     check = i
                 }
@@ -90,15 +87,15 @@ class MainActivity : AppCompatActivity() {
             Log.d("L", (check-1).toString())
             L = L.substring(0, check-1)
 
-            for(i in L.indices){
+            for(i in L.indices){ // 필터링
                 if(L[i]==','){
                     check = i
                 }
                 end = i
             }
 
-            lat = L.substring(0, check).toDouble()
-            log = L.substring(check+1, end).toDouble()
+            lat = L.substring(0, check).toDouble() // 위도
+            log = L.substring(check+1, end).toDouble() // 경도
 
 
 
@@ -108,23 +105,25 @@ class MainActivity : AppCompatActivity() {
 
             val geocoder = Geocoder(this)
             val list = geocoder.getFromLocation(lat, log, 1)
-            val address = list[0].getAddressLine(0)
+            val address = list[0].getAddressLine(0) // 위치정보
 
             L_textView.setText(address)
-
             Log.d("L", address)
 
 
 
 
+            editTextTextMultiLine.setText(textView2.getText().toString()) // 저장된 내용 불러오기
+
+            if(editTextTextMultiLine.getText().toString()==""){ // 아무것도 없다면 줄바꿈 없음
+                var a : String = editTextTextMultiLine.getText().toString() + address
+                editTextTextMultiLine.setText(a) // editText에 위치정보 추가하기
+            }else{
+                var a : String = editTextTextMultiLine.getText().toString() + "\n" + address
+                editTextTextMultiLine.setText(a) // editText에 위치정보 추가하기
+            }
+
         }
-
-
-
-
-
-
-
 
 
 
@@ -179,12 +178,12 @@ class MainActivity : AppCompatActivity() {
                 textView2.text = "${str}"
                 textView2.setText("${str}")
 
-                cha_Btn.setOnClickListener {
+                cha_Btn.setOnClickListener {// 수정 버튼
                     editTextTextMultiLine.setText(str)
                     textView2.text = "${editTextTextMultiLine.getText()}"
                 }
 
-                del_Btn.setOnClickListener {
+                del_Btn.setOnClickListener {// 삭제 버튼
                     editTextTextMultiLine.setText("")
                     removeDiary(fname)
                     var t1 = Toast.makeText(this, fname + "데이터를 삭제했습니다.", Toast.LENGTH_SHORT)
