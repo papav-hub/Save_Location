@@ -36,6 +36,8 @@ android {
 dependencies {
 
     implementation 'gun0912.ted:tedpermission:2.2.0'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    implementation 'org.permissionsdispatcher:permissionsdispatcher:4.5.0'
 
 
 

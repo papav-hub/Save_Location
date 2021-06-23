@@ -4,20 +4,21 @@ import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.*
-import androidx.appcompat.app.AppCompatActivity
+import android.location.Address
+import android.location.Geocoder
+import android.location.Location
+import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
-import android.view.View
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.model.LatLng
-import com.gun0912.tedpermission.PermissionListener
-import com.gun0912.tedpermission.TedPermission
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -30,6 +31,9 @@ class MainActivity : AppCompatActivity() {
 
     var fname : String  = ""
     var str : String = ""
+
+    var lat : Double = 0.0
+    var log : Double = 0.0
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
@@ -65,6 +69,42 @@ class MainActivity : AppCompatActivity() {
 
         L_Btn.setOnClickListener {// 위치 불러오기 버튼
             L_textView.setText(L)
+            Log.d("L", L)
+            // Location[fused 37.421998,-122.084000 hAcc=20 et=+1d13h40m16s333ms alt=5.0 vel=0.0 vAcc=40 sAcc=??? bAcc=??? {Bundle[mParcelledData.dataSize=52]}]
+            // fused A, B = 위도, 경도
+
+            L = L.replace("Location[fused ", "")
+            L = L.replace(" hAcc", "*")
+
+
+            var check : Int = 0
+            var end : Int = 0
+            for(i in L.indices){
+                if(L[i]=='*'){
+                    check = i
+                }
+            }
+            L = L.substring(0, check-1)
+
+            for(i in L.indices){
+                if(L[i]==','){
+                    check = i
+                }
+                end = i
+            }
+
+            //L = L.split(",").toString()
+
+            lat = L.substring(0, check).toDouble()
+            log = L.substring(check+1, end).toDouble()
+
+
+
+            var asdf : String = "위도 : " + lat.toString() + " 경도 : " + log.toString()
+
+            L_textView.setText(asdf)
+
+
 
         }
 
@@ -153,6 +193,8 @@ class MainActivity : AppCompatActivity() {
             textView2.setText("")
             checkedDay(year, month, dayOfMonth)
         }
+
+
 
         save_Btn.setOnClickListener{// save 버튼
             saveDiary(fname)
