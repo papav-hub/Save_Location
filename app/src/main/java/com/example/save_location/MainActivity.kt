@@ -1,5 +1,6 @@
 package com.example.save_location
 
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
 import android.content.Context
@@ -20,6 +21,7 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.locationManager
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
@@ -46,8 +48,14 @@ class MainActivity : AppCompatActivity() {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-
-        if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        /*if (ActivityCompat.checkSelfPermission(
+                this,
+                ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -58,22 +66,21 @@ class MainActivity : AppCompatActivity() {
             return
         }
         fusedLocationClient.lastLocation
-                .addOnSuccessListener { location : Location? ->
-                    // Got last known location. In some rare situations this can be null.
-                    L = location.toString()
-                }
+            .addOnSuccessListener { location : Location? ->
+                // Got last known location. In some rare situations this can be null.
+            }*/
+
 
 
         L_Btn.setOnClickListener {////////////////////////////////////////////////////////////////////////////// 위치 불러오기 버튼
             L_textView.setText(L)
-            Log.d("L", L)
             // L = Location[fused 37.421998,-122.084000 hAcc=20 et=+1d13h40m16s333ms alt=5.0 vel=0.0 vAcc=40 sAcc=??? bAcc=??? {Bundle[mParcelledData.dataSize=52]}]
             // fused A, B = 위도, 경도
 
+            Log.d("asdf", L)
+
             L = L.replace("Location[fused", "")
             L = L.replace("hAcc", "*")
-
-            Log.d("L", L)
 
 
             var check : Int = 0
@@ -83,8 +90,6 @@ class MainActivity : AppCompatActivity() {
                     check = i
                 }
             }
-            //Log.d("L", L)
-            Log.d("L", (check-1).toString())
             L = L.substring(0, check-1)
 
             for(i in L.indices){ // 필터링
@@ -101,14 +106,19 @@ class MainActivity : AppCompatActivity() {
 
             var asdf : String = "위도 : " + lat.toString() + " 경도 : " + log.toString()
 
+
+            Log.d("logD", asdf)
+
             L_textView.setText(asdf)
 
             val geocoder = Geocoder(this)
-            val list = geocoder.getFromLocation(lat, log, 1)
+            val list = geocoder.getFromLocation(lat, log, 100)
+
+
+
             val address = list[0].getAddressLine(0) // 위치정보
 
             L_textView.setText(address)
-            Log.d("L", address)
 
 
 
@@ -124,6 +134,9 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
+
+
+
 
 
 

@@ -9,7 +9,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.example.save_location"
+        applicationId "com.example.savelocation"
         minSdkVersion 16
         targetSdkVersion 29
         versionCode 1
