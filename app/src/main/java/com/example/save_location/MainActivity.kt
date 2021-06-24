@@ -103,13 +103,6 @@ class MainActivity : AppCompatActivity() {
 
         L_Btn.setOnClickListener {////////////////////////////////////////////////////////////////////////////// 위치 불러오기 버튼
 
-
-            /*val geocoder = Geocoder(this)
-            val list = geocoder.getFromLocation(lat, log, 1)
-
-            var address = list[0].getAddressLine(0) // 위치정보
-            address = address + "위치정보 없음"*/
-
             val geocoder: Geocoder
             val addresses: List<Address>
             geocoder = Geocoder(this, Locale.getDefault())
@@ -124,6 +117,9 @@ class MainActivity : AppCompatActivity() {
             val address = addresses[0].getAddressLine(0) // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
 
 
+
+
+
             L_textView.setText(address)
             editTextTextMultiLine.setText(textView2.getText().toString()) // 저장된 내용 불러오기
 
@@ -136,9 +132,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-
-
-
 
 
 
