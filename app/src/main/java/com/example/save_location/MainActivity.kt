@@ -9,24 +9,19 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
-import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.TedPermission
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.locationManager
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.IOException
 import java.util.*
-import java.util.jar.Manifest
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,10 +29,13 @@ class MainActivity : AppCompatActivity() {
     var fname : String  = ""
     var str : String = ""
 
-    var lat : Double = 0.0
-    var log : Double = 0.0
+    var lat : Double = 1.0
+    var log : Double = 1.0
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    private var locationManager : LocationManager? = null
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,9 +44,31 @@ class MainActivity : AppCompatActivity() {
 
         var L : String = ""
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        /*if (ActivityCompat.checkSelfPermission(
+        val permissionListener = object : PermissionListener { // 위치 정보 권한 허가
+            override fun onPermissionGranted() {
+                Toast.makeText(this@MainActivity, "권한 허가", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onPermissionDenied(deniedPermissions: ArrayList<String>?) {
+                Toast.makeText(this@MainActivity, "권한 거부", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        TedPermission.with(this)
+            .setPermissionListener(permissionListener)
+            .setRationaleConfirmText("권한 필요")
+            .setDeniedMessage("권한 거절")
+            .setPermissions(ACCESS_FINE_LOCATION)
+            .check()
+
+
+
+
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this) // 위치 정보 받기
+
+        if (ActivityCompat.checkSelfPermission(
                 this,
                 ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
@@ -68,61 +88,43 @@ class MainActivity : AppCompatActivity() {
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location : Location? ->
                 // Got last known location. In some rare situations this can be null.
-            }*/
+                if (location != null) {
+                    lat = location.latitude
+                    log = location.longitude
+
+
+                    var asdf : String = "위도 : " + lat.toString() + " 경도 : " + log.toString()
+                    Log.d("logD", asdf)
+                }
+            }
+
 
 
 
         L_Btn.setOnClickListener {////////////////////////////////////////////////////////////////////////////// 위치 불러오기 버튼
-            L_textView.setText(L)
-            // L = Location[fused 37.421998,-122.084000 hAcc=20 et=+1d13h40m16s333ms alt=5.0 vel=0.0 vAcc=40 sAcc=??? bAcc=??? {Bundle[mParcelledData.dataSize=52]}]
-            // fused A, B = 위도, 경도
-
-            Log.d("asdf", L)
-
-            L = L.replace("Location[fused", "")
-            L = L.replace("hAcc", "*")
 
 
-            var check : Int = 0
-            var end : Int = 0
-            for(i in L.indices){ // 필터링
-                if(L[i]=='*'){
-                    check = i
-                }
-            }
-            L = L.substring(0, check-1)
+            /*val geocoder = Geocoder(this)
+            val list = geocoder.getFromLocation(lat, log, 1)
 
-            for(i in L.indices){ // 필터링
-                if(L[i]==','){
-                    check = i
-                }
-                end = i
-            }
+            var address = list[0].getAddressLine(0) // 위치정보
+            address = address + "위치정보 없음"*/
 
-            lat = L.substring(0, check).toDouble() // 위도
-            log = L.substring(check+1, end).toDouble() // 경도
+            val geocoder: Geocoder
+            val addresses: List<Address>
+            geocoder = Geocoder(this, Locale.getDefault())
+
+            addresses = geocoder.getFromLocation(
+                lat,
+                log,
+                1
+            ) // Here 1 represent max location result to returned, by documents it recommended 1 to 5
 
 
+            val address = addresses[0].getAddressLine(0) // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
 
-            var asdf : String = "위도 : " + lat.toString() + " 경도 : " + log.toString()
-
-
-            Log.d("logD", asdf)
-
-            L_textView.setText(asdf)
-
-            val geocoder = Geocoder(this)
-            val list = geocoder.getFromLocation(lat, log, 100)
-
-
-
-            val address = list[0].getAddressLine(0) // 위치정보
 
             L_textView.setText(address)
-
-
-
-
             editTextTextMultiLine.setText(textView2.getText().toString()) // 저장된 내용 불러오기
 
             if(editTextTextMultiLine.getText().toString()==""){ // 아무것도 없다면 줄바꿈 없음
